@@ -12,14 +12,19 @@ static constexpr int OPP = 0;
 static constexpr int NONE = -1;
 
 struct Tile {
-    int x, y, scrap_amount, owner, units;
-    bool recycler, can_build, can_spawn, in_range_of_recycler;
+    int x, y, scrap_amount, owner, units,recycler,can_build;
+    double spawnScore;
+    bool can_spawn, in_range_of_recycler;
         ostream& dump(ostream& ioOut) const {
         ioOut << x << " " << y;
         return ioOut;
     }
 };
 ostream& operator<<(ostream& ioOut, const Tile& obj) { return obj.dump(ioOut); }
+
+double distance(const Tile &a,const Tile &b){
+    return std::abs(a.x - b.x) + std::abs(a.y - b.y);
+}
 
 
 int main()
@@ -80,47 +85,78 @@ int main()
         }
 
         vector<string> actions; //Cria um vetor de actions;
+        vector<Tile> targetTiles;
+        vector<Tile> canSpawnTiles;
 
         
-        for (vector<Tile>::iterator it = my_tiles.begin(); it != my_tiles.end(); ++it) { //Cria um iterador para percorrer o vector de minhas tiles;
-        //Já que cada tile contem um objeto, o iterador é um objeto também.
-            Tile tile = *it;
+
+          for (const auto& tile : my_tiles) {
             if (tile.can_spawn) {
-                int amount = 0; // TO DO: pick amount of robots to spawn here // A fazer: escolher a quantidade de robos para serem spawnados na Minha tile:
-                if (amount > 0) {
-                    ostringstream action; //
-                    action << "SPAWN " << amount << " " << tile; //string SPAWN.... é guardada em action
-                    actions.emplace_back(
-                        action.str() // action como cout
-                    );
-                }
-            }
-            if (tile.can_build) {
-                bool should_build = false; // TODO: pick whether to build recycler here// A fazer: se eu quiser construir um recycler no tile atual:
-                if (should_build) {
-                    ostringstream action;
-                    action << "BUILD " << tile;
-                    actions.emplace_back(
-                        action.str()
-                    );
-                }
+                canSpawnTiles.push_back(tile);
             }
         }
 
-        for (Tile tile : my_units) {
-            bool should_move = true; // TODO: pick whether to move units from here //A FAZER: escolha se eu quero mover minhas tropas a partir da tile atual
-            if (should_move) {
-                int amount = 1; // TODO: pick amount of units to move //A fazer: escolha a quantidade de unidades a serem movidas
+        for (const auto& tile : opp_tiles) {
+            if (!tile.recycler) {
+                targetTiles.push_back(tile);
+            }
+        }
 
-                for(Tile target : neutral_tiles){
-                    ostringstream action;
-                    action << "MOVE " << amount << " " << tile.x << " " <<tile.y<< " " <<target.x<<" "<<target.y ;
+        for (const auto& tile : neutral_tiles) {
+            if (tile.scrap_amount > 0) { //GARANTE QUE UMA TILE NEUTRAL NAO SEJA UMA GRAMA
+                targetTiles.push_back(tile);
+            }
+        }
+
+
+        for (auto& tile : canSpawnTiles) {
+            double totalDistance = 0;
+            for (const auto& target : targetTiles) {
+                totalDistance += distance(tile, target);
+            }
+            tile.spawnScore = totalDistance / targetTiles.size(); //Todas tiles em canSpawnTiles agora terão um score atribuido a elas que é a relacao entre Distancia e a quantidade total de target tiles
+        } 
+
+
+        std::sort(canSpawnTiles.begin(), canSpawnTiles.end(), [](const Tile& a, const Tile& b) { //Ordena o vetor de canSpawnTiles com base no score de suas tiles;
+            return a.spawnScore < b.spawnScore;
+        });
+
+   
+          const Tile& target = my_tiles[0];
+        if ( my_matter >= 10) {
+            actions.push_back("SPAWN 1 " + std::to_string(target.x) + " " + std::to_string(target.y));
+        }
+         
+   
+
+        for (Tile tile : my_units) {
+
+            std::sort(targetTiles.begin(), targetTiles.end(), [&tile](const Tile& a, const Tile& b) { //ORDENA O VETOR DE TARGETS COM BASE NA MENOR DISTANCIA ENTRE UMA TILE DE MYUNITS E UMA TARGET TILE
+                return distance(tile, a) < distance(tile, b);
+            });
+
+        
+
+
+           /*  bool should_move = false; // TODO: pick whether to move units from here //A FAZER: escolha se eu quero mover minhas tropas a partir da tile atual
+            if (should_move) {
+                int amount = 0; // TODO: pick amount of units to move //A fazer: escolha a quantidade de unidades a serem movidas
+                Tile target; // TODO: pick a destination //A fazer: Escolha um destino
+                ostringstream action;
+                    action << "MOVE " << amount << " " << tile << " " << target;
                     actions.emplace_back(
                         action.str()
                     );
-                }
-                //Tile target; // TODO: pick a destination //A fazer: Escolha um destino
-                
+            } */
+
+
+            if (!targetTiles.empty()) {
+                const Tile& target = targetTiles[0];
+                int amount = tile.units > 1 ? tile.units - 1 : 1;
+                actions.push_back("MOVE " + std::to_string(amount) + " " + std::to_string(tile.x) + " " +
+                                  std::to_string(tile.y) + " " + std::to_string(target.x) + " " +
+                                  std::to_string(target.y));
             }
         }
 
