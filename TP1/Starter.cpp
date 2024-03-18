@@ -108,9 +108,9 @@ int main()
         }
 
         for (Tile tile : my_units) {
-            bool should_move = true; // TODO: pick whether to move units from here //A FAZER: escolha se eu quero mover minhas tropas a partir da tile atual
+            bool should_move = false; // TODO: pick whether to move units from here //A FAZER: escolha se eu quero mover minhas tropas a partir da tile atual
             if (should_move) {
-                int amount = 1; // TODO: pick amount of units to move //A fazer: escolha a quantidade de unidades a serem movidas
+                int amount = 0; // TODO: pick amount of units to move //A fazer: escolha a quantidade de unidades a serem movidas
                 Tile target; // TODO: pick a destination //A fazer: Escolha um destino
                 ostringstream action;
                     action << "MOVE " << amount << " " << tile << " " << target;

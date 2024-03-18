@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "sstream": "cpp",
+        "iosfwd": "cpp"
     }
 }
