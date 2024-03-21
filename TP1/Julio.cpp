@@ -7,13 +7,16 @@
 
 using namespace std;
 
+
 static constexpr int ME = 1;
 static constexpr int OPP = 0;
 static constexpr int NONE = -1;
 
 struct Tile {
     int x, y, scrap_amount, owner, units,recycler,can_build;
-    double spawnScore;
+    
+    double tilePoints; //Para cada Tile, é atribuída uma pontuacao com base em sua distancia em relacao a uma tile que EU possuo.
+
     bool can_spawn, in_range_of_recycler;
         ostream& dump(ostream& ioOut) const {
         ioOut << x << " " << y;
@@ -23,7 +26,7 @@ struct Tile {
 ostream& operator<<(ostream& ioOut, const Tile& obj) { return obj.dump(ioOut); }
 
 double distancia(const Tile &a,const Tile &b){
-    return std::abs(a.x - b.x) + std::abs(a.y - b.y);
+    return abs(a.x - b.x) + abs(a.y - b.y);
 }
 
 
@@ -85,54 +88,46 @@ int main()
         }
 
         vector<string> actions; //Cria um vetor de actions;
-        vector<Tile> targetTiles;
-        vector<Tile> canSpawnTiles;
+        vector<Tile> targetTiles; //Cria um vetor que guarda todas as possíveis tiles a serem visitadas por cada agente.
+        vector<Tile> P_Tiles; //Cria um vetor de Tiles nas quais pode ter spawn de algum robô
 
         
 
-          for (const auto& tile : my_tiles) {
+        for (const Tile tile : my_tiles) {
             if (tile.can_spawn) {
-                canSpawnTiles.push_back(tile);
+               P_Tiles.push_back(tile); //Adiciono minhas tiles a P_tiles
             }
         }
 
-        for (const auto& tile : opp_tiles) {
+        for (const Tile tile : opp_tiles) {
             if (!tile.recycler) {
                 targetTiles.push_back(tile);
             }
         }
 
-        for (const auto& tile : neutral_tiles) {
+        for (const Tile tile : neutral_tiles) {
             if (tile.scrap_amount > 0) { //GARANTE QUE UMA TILE NEUTRAL NAO SEJA UMA GRAMA
                 targetTiles.push_back(tile);
             }
         }
 
 
-        for (auto& tile : canSpawnTiles) {
-            double totalDistance = 0;
+        for (auto& tile : P_Tiles) { //Para cada uma das minhas tiles
+            double distanciaTotal = 0;
             for (const auto& target : targetTiles) {
-                totalDistance += distancia(tile, target);
+                distanciaTotal += distancia(tile, target);
             }
-            tile.spawnScore = totalDistance / targetTiles.size(); //Todas tiles em canSpawnTiles agora terão um score atribuido a elas que é a relacao entre Distancia e a quantidade total de target tiles
+            tile.tilePoints = distanciaTotal / 100; //Todas tiles em canSpawnTiles agora terão um score atribuido a elas que é a relacao entre Distancia e a quantidade total de target tiles possíveis
         } 
 
 
-        std::sort(canSpawnTiles.begin(), canSpawnTiles.end(), [](const Tile& a, const Tile& b) { //Ordena o vetor de canSpawnTiles com base no score de suas tiles;
-            return a.spawnScore < b.spawnScore;
+        sort(P_Tiles.begin(), P_Tiles.end(), [](const Tile& a, const Tile& b) { //Ordena o vetor de canSpawnTiles com base no score de suas tiles;
+            return a.tilePoints < b.tilePoints;
         });
-
-   
-          const Tile& target = my_tiles[0];
-        if ( my_matter >= 10) {
-            actions.push_back("SPAWN 1 " + std::to_string(target.x) + " " + std::to_string(target.y));
-        }
-         
-   
 
         for (Tile tile : my_units) {
 
-            std::sort(targetTiles.begin(), targetTiles.end(), [&tile](const Tile& a, const Tile& b) { //ORDENA O VETOR DE TARGETS COM BASE NA MENOR DISTANCIA ENTRE UMA TILE DE MYUNITS E UMA TARGET TILE
+            sort(targetTiles.begin(), targetTiles.end(), [&tile](const Tile& a, const Tile& b) { //ORDENA O VETOR DE TARGETS COM BASE NA MENOR DISTANCIA ENTRE UMA TILE DE MYUNITS E UMA TARGET TILE
                 return distancia(tile, a) < distancia(tile, b);
             });
 
@@ -154,10 +149,16 @@ int main()
             if (!targetTiles.empty()) {
                 const Tile& target = targetTiles[0];
                 int amount = tile.units > 1 ? tile.units - 1 : 1;
-                actions.push_back("MOVE " + std::to_string(amount) + " " + std::to_string(tile.x) + " " +
-                                  std::to_string(tile.y) + " " + std::to_string(target.x) + " " +
-                                  std::to_string(target.y));
+                actions.push_back("MOVE " + to_string(amount) + " " + to_string(tile.x) + " " +
+                                  to_string(tile.y) + " " + to_string(target.x) + " " +
+                                  to_string(target.y));
             }
+        
+        
+        }
+        const Tile& target = my_tiles[0]; 
+        if ( my_matter >= 10) { 
+            actions.push_back("SPAWN 1 " + to_string(target.x) + " " + to_string(target.y)); //O SPAWN é feito se possuo a quantidade necessaria, e "simplesmente" faz o spawn na primeira tile das minhas tiles a todo momento.
         }
 
         // Write an action using cout. DON'T FORGET THE "<< endl"
