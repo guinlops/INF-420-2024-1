@@ -91,16 +91,16 @@ class AEstrelaImp(AEstrela):
 
 
 
-    def Astar(self, tab_inicial:QuebraCabeca):
+    def Astar(self, tab_inicial:QuebraCabeca,closedSet):
         self.openSet=[] ##open set é um set de objetos
-        self.closedSet=set() ## closed set é um set de hashs
         
         
         
-        self.closedSet.add(tab_inicial.hashCode())
+        
+        closedSet.add(tab_inicial.hashCode())
         ###print("Tamanho de openset antes ",len(self.openSet))
         
-        self.geraTabs(tab_inicial,self.openSet, self.closedSet)
+        self.geraTabs(tab_inicial,self.openSet, closedSet)
         ###print("g: ",self.g)
         ###print("Tamanho de openset antes ",len(self.openSet))
         self.openSet=sorted(self.openSet, key=lambda obj: obj.getf()) ## ordenacao com base na heuristica
@@ -123,7 +123,7 @@ class AEstrelaImp(AEstrela):
 
         ##Assumindo que o deslocamento é de : a posicao vazia swap posicao passada para o vetor de solucao:
         self.solucao.append(Posicao(  self.openSet[0].getPosVazio().getLinha(),self.openSet[0].getPosVazio().getColuna()   ))
-        self.closedSet.add(self.openSet[0])
+        closedSet.add(self.openSet[0])
 
         print("tamanho do openset:" , len(self.openSet))
         
@@ -132,16 +132,47 @@ class AEstrelaImp(AEstrela):
         newTab=self.openSet[0]
         self.openSet=[]
 
-        ##self.Astar(newTab)
-
-
-
+        ##self.Astar(newTab,closedSet)
         return False
 
+
+    def getInvCount(self,tab):
+        inv_count = 0
+        empty_value = -1
+        n = 3  # Tamanho da matriz, assumindo que seja uma matriz 3x3
+
+        # Convertendo a matriz em uma lista unidimensional
+        flattened_tab = [element for row in tab for element in row]
+
+        for i in range(n * n):
+            for j in range(i + 1, n * n):
+                if flattened_tab[j] != empty_value and flattened_tab[i] != empty_value and flattened_tab[i] > flattened_tab[j]:
+                    inv_count += 1
+        return inv_count
+    
+
+    def isSolvable(self,tab) :
+ 
+        # Count inversions in given 8 puzzle
+        inv_count = self.getInvCount(tab)
+    
+        # return true if inversion count is even.
+        return (inv_count % 2 == 0)
+
+
+
     def getSolucao(self, qc:QuebraCabeca):
-        
-        self.Astar(qc)
-        
+
+
+        #print("eh solucionavel?: ", self.isSolvable(qc.getTab()))
+
+        if(not self.isSolvable(qc.getTab())):
+            print("Nao eh solucionavel")
+        else:
+            print("Eh solucionavel")
+            self.closedSet=set() ## closed set é um set de hashs
+            self.Astar(qc,self.closedSet)
+       
         
         return self.solucao
 
