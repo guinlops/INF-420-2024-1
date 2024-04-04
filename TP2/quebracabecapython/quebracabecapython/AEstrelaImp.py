@@ -91,7 +91,8 @@ class AEstrelaImp(AEstrela):
         if(tab_inicial.isOrdenado()):
             
             
-            print("ordenado!")
+            ##print("ordenado!")
+            print("Depois:")
             print(tab_inicial.toString())
             print("-------------------------------------------------------")
             return True
@@ -166,8 +167,12 @@ class AEstrelaImp(AEstrela):
         else:
             print("Eh solucionavel")
             self.closedSet=set() ## closed set é um set de hashs
+            print("Antes: ")
+            print(qc.toString())
+
             self.Astar(qc,self.closedSet) ##qc não é de fato modificado, mas sua cópia sim.
 
+         
             
             
        
