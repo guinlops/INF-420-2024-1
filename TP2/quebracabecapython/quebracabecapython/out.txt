@@ -1,0 +1,1 @@
+Comp1 : inicial.f: 6
