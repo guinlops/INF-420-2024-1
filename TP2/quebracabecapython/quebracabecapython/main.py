@@ -13,6 +13,8 @@ def main():
    
     #tab=[[1, 2, 3], [4, QuebraCabecaImp.VAZIO, 5], [6, 7, 8]] #gabarito
 
+    #tab=[[1,2,3],[QuebraCabecaImp.VAZIO,4,5],[6,7,8]]
+
     qc.setTab(tab)
 
     tempo = datetime.datetime.now()

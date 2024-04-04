@@ -78,7 +78,7 @@ class AEstrelaImp(AEstrela):
         
         
 
-        print("-------------------------------------------------------")
+        ##print("-------------------------------------------------------")
         """  for i in range(len(openSet)):
             print("hash: ",openSet[i].hashCode())
             print("h: ",openSet[i].getValor())
@@ -92,48 +92,58 @@ class AEstrelaImp(AEstrela):
 
 
     def Astar(self, tab_inicial:QuebraCabeca,closedSet):
+        print("-------------------------------------------------------")
         self.openSet=[] ##open set é um set de objetos
+        print("g (depth): ", self.g)
+        print("h: ",tab_inicial.getValor())
+        print("f: ",tab_inicial.getf())
+        print(tab_inicial.toString())
+         ##Se tiver ordenado, return
+        if(tab_inicial.isOrdenado()):
+            
+            tab_inicial.toString()
+            print("ordenado!")
+            print("-------------------------------------------------------")
+            return True
         
-        
-        
-        
+        #Adiciona o hash da tab atual ao closedSet      
         closedSet.add(tab_inicial.hashCode())
-        ###print("Tamanho de openset antes ",len(self.openSet))
-        
+  
+        #Gera Possiveis movimentos a partir da tab inicial e os coloca no openSet
         self.geraTabs(tab_inicial,self.openSet, closedSet)
-        ###print("g: ",self.g)
-        ###print("Tamanho de openset antes ",len(self.openSet))
+
+        #o OpenSet é ordenado com base na heuristica
         self.openSet=sorted(self.openSet, key=lambda obj: obj.getf()) ## ordenacao com base na heuristica
         
-        print("Opcoes possíveis de forma ordenda: ")
+        """  print("Opcoes possíveis de forma ordenda: ")
         for i in range(len(self.openSet)):
             print("hash: ",self.openSet[i].hashCode())
             print("g: ", self.g)
             print("h: ",self.openSet[i].getValor())
             print("f: ",self.openSet[i].getf())
-            print(self.openSet[i].toString())
+            print(self.openSet[i].toString()) """
         ##Ordenar o set com base em sua heuristica e pegar o primeiro objeto
 
-        if(self.openSet[0].isOrdenado()==True):
-            print("ta ordenado!!")
-            return True
+
+
+    ##RESOLVER O OPENSET, FAZER COM QUE ELE VISITE OUTROS ESTADOS ANTERIORES, JA QUE UM CAMINHO SÓ PODE NAO SER O IDEAL, ELE PODERIA VOLTAR A OUTROS. USANDO UM HEAP TVZ?
+
+       
         
         print("Nao ta ordenado!!")
+        tab_inicial.toString()
 
-
+        newTab=QuebraCabecaImp()
         ##Assumindo que o deslocamento é de : a posicao vazia swap posicao passada para o vetor de solucao:
-        self.solucao.append(Posicao(  self.openSet[0].getPosVazio().getLinha(),self.openSet[0].getPosVazio().getColuna()   ))
-        closedSet.add(self.openSet[0])
-
-        print("tamanho do openset:" , len(self.openSet))
-        
-        ##openset setado para proxima iteracao
-        
-        newTab=self.openSet[0]
+        if(len(self.openSet)!=0):
+            self.solucao.append(Posicao(self.openSet[0].getPosVazio().getLinha(),self.openSet[0].getPosVazio().getColuna()))
+            newTab=self.openSet[0]
+      
+       
         self.openSet=[]
-
-        ##self.Astar(newTab,closedSet)
-        return False
+        print("-------------------------------------------------------")
+        self.Astar(newTab,closedSet)
+        
 
 
     def getInvCount(self,tab):
