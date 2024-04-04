@@ -1,6 +1,6 @@
 import random
 from Posicao import Posicao
-from QuebraCabeca import QuebraCabeca
+from QuebraCabeca_modified import QuebraCabeca
 
 class QuebraCabecaImp(QuebraCabeca):
     tabGabarito = [[1, 2, 3], [4, QuebraCabeca.VAZIO, 5], [6, 7, 8]]
@@ -10,7 +10,11 @@ class QuebraCabecaImp(QuebraCabeca):
         aux_tab = [1, 2, 3, 4, 5, 6, 7, 8, QuebraCabeca.VAZIO]
         random.shuffle(aux_tab)
         self.tab = [aux_tab[0:3], aux_tab[3:6], aux_tab[6:9]]
-        self.f=0 ##ALTERACAO GUILHERME NUNES, DEFINO UMA FUNCAO HEURISTICA PARA CADA TAB
+
+
+        ##ALTERACAO GUILHERME NUNES, FUNCAO HEURISTICA PARA CADA TAB
+        self.f=0 
+        ######################
 
     # Metodo que retorna uma copia do array interno de posicoes (-1 = vazio)
     # @return int[][] - um array 3x3 de inteiros
@@ -87,12 +91,15 @@ class QuebraCabecaImp(QuebraCabeca):
                     valor = valor + (abs(pos.getLinha()-i) + abs(pos.getColuna()-j))
         return valor
 
+
+    ############GUILHERME#################
+    
     def setf(self,g):
         self.f=g+self.getValor()
 
     def getf(self):
         return self.f
-
+    ###############################
     # retorna a posicao de um valor em relacao a um array
     # @param valor
     # @param tab array a ser investigado

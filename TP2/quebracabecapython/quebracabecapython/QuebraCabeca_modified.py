@@ -69,6 +69,8 @@ class QuebraCabeca(metaclass=abc.ABCMeta):
     def hashCode(self):
         return
 
+
+    ##MODIFICACOES (GUILHERME)--Metodos get e self para a funcao heuristica
     @abc.abstractmethod
     def setf(self,g):
         return

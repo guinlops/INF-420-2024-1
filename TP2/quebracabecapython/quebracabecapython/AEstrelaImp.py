@@ -1,10 +1,10 @@
-# Nome:
-# Matricula: 
+# Nome: Guilherme Nunes Lopes   
+# Matricula: 105462
 
 from Posicao import Posicao
 from AEstrela import AEstrela
-from QuebraCabeca import QuebraCabeca
-from QuebraCabecaImp import QuebraCabecaImp
+from QuebraCabeca_modified import QuebraCabeca
+from QuebraCabecaImp_modified import QuebraCabecaImp
 
 import sys
 sys.setrecursionlimit(10000) ##Evita RecursionError: maximum recursion depth exceeded para que minha solucao possa ser implementada de forma recursiva
@@ -23,7 +23,7 @@ class AEstrelaImp(AEstrela):
         return h+g
     
 
-    def fazTroca(self,tab:QuebraCabeca, i,j,x,y): ##tab é passado como referencia???? assumindo que nao
+    def fazTroca(self,tab:QuebraCabeca, i,j,x,y): ##Faz a troca de posicoes e retorna um tabuleiro int[][]
         self.aux=tab.getTab()
         self.aux[i][j],self.aux[x][y]=self.aux[x][y],self.aux[i][j]
         tab=tab.setTab(self.aux)
@@ -48,7 +48,7 @@ class AEstrelaImp(AEstrela):
 
         for i in range(len(self.listaMovPossiveis)):
             self.temp=QuebraCabecaImp()
-            self.temp.setTab(tab.getTab())### temp recebe o tabuleio atual]
+            self.temp.setTab(tab.getTab())### temp recebe o tabuleiro atual
 
             ##self.i," ",self.j," -> vazio") qual i e qual j vao ser trocadas pelas x e y da posicao vazia
             self.i=self.listaMovPossiveis[i].getLinha() 
@@ -66,15 +66,11 @@ class AEstrelaImp(AEstrela):
             ##Verifica se o hash dessa tab esta em closed set, ou seja, verifica se esse tab ja nao foi "encontrado"
             if( not(self.isInSet(self.temp,self.closedSet)) ):
                 self.temp.setf(self.g)
-                ##openSet.add(self.temp)
-
                 #Adiciona esse tabuleiro a um vetor que contem todos os tabuleiros possíveis a partir o tabuleiro inicial
                 openSet.append(self.temp)
          
-        
-
-        ##print("-------------------------------------------------------")
-        """  for i in range(len(openSet)):
+            ##print("Informacoes para depuracao")
+            """  for i in range(len(openSet)):
             print("hash: ",openSet[i].hashCode())
             print("h: ",openSet[i].getValor())
             print("f: ",openSet[i].getf())
@@ -82,30 +78,21 @@ class AEstrelaImp(AEstrela):
             """
     
 
-               
-           
-            
-            
-        
-        
-        
-       
-
-
-
-
     def Astar(self, tab_inicial:QuebraCabeca,closedSet):
        
         self.openSet=[] ##open set é um set de objetos
-        print("g (depth): ", self.g)
+
+        #Informacoes de depuracao para cada tabuleiro percorrido.
+        """  print("g (depth): ", self.g)
         print("h: ",tab_inicial.getValor())
         print("f: ",tab_inicial.getf())
-        print(tab_inicial.toString())
+        print(tab_inicial.toString()) """
          ##Se tiver ordenado, return
         if(tab_inicial.isOrdenado()):
             
-            tab_inicial.toString()
+            
             print("ordenado!")
+            print(tab_inicial.toString())
             print("-------------------------------------------------------")
             return True
         
@@ -118,28 +105,29 @@ class AEstrelaImp(AEstrela):
         #o OpenSet é ordenado com base na heuristica
         self.openSet=sorted(self.openSet, key=lambda obj: obj.getf()) ## ordenacao com base na heuristica
         
-        """  print("Opcoes possíveis de forma ordenda: ")
+        """  print("Informarcoes heuristicas para depuracao de possiveis tabuleiros ")
         for i in range(len(self.openSet)):
             print("hash: ",self.openSet[i].hashCode())
             print("g: ", self.g)
             print("h: ",self.openSet[i].getValor())
             print("f: ",self.openSet[i].getf())
             print(self.openSet[i].toString()) """
-        ##Ordenar o set com base em sua heuristica e pegar o primeiro objeto
+    
        
-        print("Nao ta ordenado!!")
-        tab_inicial.toString()
+        ##print("Nao ta ordenado nesse ponto!!")
+        ##tab_inicial.toString()
 
+        #Cria um tab temporario
         newTab=QuebraCabecaImp()
         ##Assumindo que o deslocamento é de : a posicao vazia swap posicao passada para o vetor de solucao:
         if(len(self.openSet)!=0):
             self.solucao.append(Posicao(self.openSet[0].getPosVazio().getLinha(),self.openSet[0].getPosVazio().getColuna()))
-            newTab=self.openSet[0]
+            newTab=self.openSet[0] ##new tab vai ser o tabuleiro de "melhor" heuristica, ja que o vetor foi ordenado com base na heuristica
       
        
-        self.openSet=[]
-        print("-------------------------------------------------------")
-        self.Astar(newTab,closedSet)
+        self.openSet=[]#Vetor de possíveis tabuleiros é zerado, já que os possíveis vao ser relativos a newTab, e nao a tab_inicial.
+        ##print("-------------------------------------------------------")
+        self.Astar(newTab,closedSet)##Chama recursivamente a funcao Astar, até que o tabuleiro esteja ordenado. 
         
 
 
@@ -178,7 +166,10 @@ class AEstrelaImp(AEstrela):
         else:
             print("Eh solucionavel")
             self.closedSet=set() ## closed set é um set de hashs
-            self.Astar(qc,self.closedSet)
+            self.Astar(qc,self.closedSet) ##qc não é de fato modificado, mas sua cópia sim.
+
+            
+            
        
         
         return self.solucao

@@ -1,7 +1,7 @@
 import datetime
 from Posicao import Posicao
 from AEstrelaImp import AEstrelaImp
-from QuebraCabecaImp import QuebraCabecaImp
+from QuebraCabecaImp_modified import QuebraCabecaImp
 
 def main():
     qc = QuebraCabecaImp()
