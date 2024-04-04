@@ -6,7 +6,8 @@ from AEstrela import AEstrela
 from QuebraCabeca import QuebraCabeca
 from QuebraCabecaImp import QuebraCabecaImp
 
-
+import sys
+sys.setrecursionlimit(10000) ##Evita RecursionError: maximum recursion depth exceeded para que minha solucao possa ser implementada de forma recursiva
 class AEstrelaImp(AEstrela):
     
     def __init__(self) :
@@ -59,23 +60,17 @@ class AEstrelaImp(AEstrela):
 
             ##print(self.i," ",self.j," -> ",self.x," ", self.y)
 
-            ##Gera um vetor com uma troca possivel
+            ##Gera um tabuleiro a partir de troca possível de ser feita
             self.temp.setTab(self.fazTroca(self.temp,self.i,self.j,self.x,self.y))
            
             ##Verifica se o hash dessa tab esta em closed set, ou seja, verifica se esse tab ja nao foi "encontrado"
             if( not(self.isInSet(self.temp,self.closedSet)) ):
                 self.temp.setf(self.g)
                 ##openSet.add(self.temp)
+
+                #Adiciona esse tabuleiro a um vetor que contem todos os tabuleiros possíveis a partir o tabuleiro inicial
                 openSet.append(self.temp)
-                
-           
-            
-            
-        
-        
-        
-       
-        
+         
         
 
         ##print("-------------------------------------------------------")
@@ -87,12 +82,20 @@ class AEstrelaImp(AEstrela):
             """
     
 
+               
+           
+            
+            
+        
+        
+        
+       
 
 
 
 
     def Astar(self, tab_inicial:QuebraCabeca,closedSet):
-        print("-------------------------------------------------------")
+       
         self.openSet=[] ##open set é um set de objetos
         print("g (depth): ", self.g)
         print("h: ",tab_inicial.getValor())
@@ -123,13 +126,7 @@ class AEstrelaImp(AEstrela):
             print("f: ",self.openSet[i].getf())
             print(self.openSet[i].toString()) """
         ##Ordenar o set com base em sua heuristica e pegar o primeiro objeto
-
-
-
-    ##RESOLVER O OPENSET, FAZER COM QUE ELE VISITE OUTROS ESTADOS ANTERIORES, JA QUE UM CAMINHO SÓ PODE NAO SER O IDEAL, ELE PODERIA VOLTAR A OUTROS. USANDO UM HEAP TVZ?
-
        
-        
         print("Nao ta ordenado!!")
         tab_inicial.toString()
 
@@ -163,10 +160,10 @@ class AEstrelaImp(AEstrela):
 
     def isSolvable(self,tab) :
  
-        # Count inversions in given 8 puzzle
+        # Conta o numero de "Inversoes no tabuleiro"
         inv_count = self.getInvCount(tab)
     
-        # return true if inversion count is even.
+        # return true se o numero de inversoes é par.
         return (inv_count % 2 == 0)
 
 
