@@ -114,13 +114,16 @@ class QLearningAgent(ReinforcementAgent):
           HINT: You might want to use util.flipCoin(prob)
           HINT: To pick randomly from a list, use random.choice(list)
         """
-        # Pick Action
-        legalActions = self.getLegalActions(state)
-        action = None
-        "**** YOUR CODE HERE ****"
-        util.raiseNotDefined()
+        AllActions=self.getLegalActions(state)
+        #action = QLearningAgent.getAction(self,state)
+        #self.doAction(state,action)
+        #return action
+        if util.flipCoin(self.epsilon) :
+          return random.choice(AllActions)
+        else :
+          return self.getPolicy(state)
+        
 
-        return action
 
     def update(self, state, action, nextState, reward):
         """
@@ -178,6 +181,7 @@ class PacmanQAgent(QLearningAgent):
         action = QLearningAgent.getAction(self,state)
         self.doAction(state,action)
         return action
+       
 
 
 class ApproximateQAgent(PacmanQAgent):
@@ -202,14 +206,25 @@ class ApproximateQAgent(PacmanQAgent):
           where * is the dotProduct operator
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        featureVector = self.featExtractor.getFeatures(state, action)
+        Qvalue = 0
+        #o agente usa uma função de aproximação para calcular os Q-values dinamicamente com base em uma representação compacta do estado.
+        for feature in featureVector :
+            Qvalue += featureVector[feature]*self.getWeight(feature)
+        return Qvalue
+
+        #util.raiseNotDefined()
 
     def update(self, state, action, nextState, reward):
         """
            Should update your weights based on transition
         """
         "**** YOUR CODE HERE ****"
-
+        allFeatures = self.featExtractor.getFeatures(state, action)
+        #Representação Linear para o q-learning Aproximado
+        difference = reward + (self.discount * self.getValue(nextState)) - self.getQValue(state, action)
+        for feature in allFeatures:
+            self.weights[feature] = self.getWeight(feature) + (self.alpha * difference * allFeatures[feature])
        
         ###util.raiseNotDefined()
 
