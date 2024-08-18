@@ -12,6 +12,13 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
+
+
+#Nome: Guilherme Nunes Lopes
+#Matricula: 105462
+#Resposta para o passo 3: NÃO É POSSÍVEL
+
+
 from game import *
 from learningAgents import ReinforcementAgent
 from featureExtractors import *
