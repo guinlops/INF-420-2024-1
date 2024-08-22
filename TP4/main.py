@@ -200,24 +200,25 @@ def evaluate_model(model, X, Y, kf):
 def naive_bayes_experiment(X, Y, kf):
     model = GaussianNB()
     evaluate_model(model, X, Y, kf)  # Avalia o modelo com matriz de confusão e relatório de métricas
-    pipeline = make_pipeline(StandardScaler(), model)
-    scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
-    mean_accuracy = scores.mean()
+    #pipeline = make_pipeline(StandardScaler(), model)
+    #scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
+    mean_accuracy = all_metrics[-1][1]
     #print(f'Naive Bayes: Acurácia média = {mean_accuracy:.4f}, Desvio padrão = {scores.std():.4f}')
     return mean_accuracy
 
 def decision_tree_experiment(X, Y, kf):
     depths = [None, 5, 10, 15, 20]
-    accuracies = []
+    dte_accuracies = []
 
     for depth in depths:
         model = DecisionTreeClassifier(max_depth=depth, random_state=42)
         evaluate_model(model, X, Y, kf)  # Avalia o modelo com matriz de confusão e relatório de métricas
-        pipeline = make_pipeline(StandardScaler(), model)
-        scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
-        accuracies.append(scores.mean())
+        dte_accuracies.append(all_metrics[-1][1])
+        #pipeline = make_pipeline(StandardScaler(), model)
+        #scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
+        #accuracies.append(scores.mean())
 
-    plt.plot(depths, accuracies, marker='o')
+    plt.plot(depths, dte_accuracies, marker='o')
     plt.xlabel('Profundidade Máxima')
     plt.ylabel('Acurácia Média')
     plt.title('Impacto da Profundidade Máxima na Acurácia do Decision Tree')
@@ -226,34 +227,50 @@ def decision_tree_experiment(X, Y, kf):
 
 def svm_experiment(X, Y, kf):
     kernels = ['linear', 'rbf']
-    accuracies = []
+    svm_accuracies = []
 
     for kernel in kernels:
         model = SVC(kernel=kernel, random_state=42)
         evaluate_model(model, X, Y, kf)  # Avalia o modelo com matriz de confusão e relatório de métricas
-        pipeline = make_pipeline(StandardScaler(), model)
-        scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
-        accuracies.append(scores.mean())
+        svm_accuracies.append(all_metrics[-1][1])
+        #pipeline = make_pipeline(StandardScaler(), model)
+        #scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
+        #svm_accuracies.append(round(scores.mean(),4))
 
-    plt.bar(kernels, accuracies, color=['blue', 'green'])
-    plt.xlabel('Kernel')
-    plt.ylabel('Acurácia Média')
-    plt.title('Comparação entre Kernels do SVM')
-    plt.grid(True)
+    
+    df_results = pd.DataFrame({
+        'Kernel': kernels,
+        'Acurácia Média': svm_accuracies
+    })
+
+    # Plota a tabela usando matplotlib
+    fig, ax = plt.subplots(figsize=(6, 2))  # Ajuste o tamanho da figura conforme necessário
+    ax.axis('tight')
+    ax.axis('off')
+
+    title = 'Comparação de Kernels do SVM'
+    plt.title(title, fontsize=14, pad=20)
+
+    table = ax.table(cellText=df_results.values, colLabels=df_results.columns, cellLoc='center', loc='center')
+    table.auto_set_font_size(False)
+    table.set_fontsize(12)
+    table.scale(1, 1.5)  # Ajusta o tamanho da célula
+
     plt.show()
 
 def knn_experiment(X, Y, kf):
     k_values = [1, 3, 5, 7, 9, 11]
-    accuracies = []
+    knn_accuracies = []
 
     for k in k_values:
         model = KNeighborsClassifier(n_neighbors=k)
         evaluate_model(model, X, Y, kf)  # Avalia o modelo com matriz de confusão e relatório de métricas
-        pipeline = make_pipeline(StandardScaler(), model)
-        scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
-        accuracies.append(scores.mean())
+        knn_accuracies.append(all_metrics[-1][1])
+        #pipeline = make_pipeline(StandardScaler(), model)
+        #scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
+        #accuracies.append(scores.mean())
 
-    plt.plot(k_values, accuracies, marker='o')
+    plt.plot(k_values, knn_accuracies, marker='o')
     plt.xlabel('Número de Vizinhos (k)')
     plt.ylabel('Acurácia Média')
     plt.title('Impacto do Número de Vizinhos na Acurácia do k-NN')
@@ -262,16 +279,17 @@ def knn_experiment(X, Y, kf):
 
 def random_forest_experiment(X, Y, kf):
     n_trees = [10, 50, 100, 200, 300]
-    accuracies = []
+    rf_accuracies = []
 
     for n in n_trees:
         model = RandomForestClassifier(n_estimators=n, random_state=42)
         evaluate_model(model, X, Y, kf)  # Avalia o modelo com matriz de confusão e relatório de métricas
-        pipeline = make_pipeline(StandardScaler(), model)
-        scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
-        accuracies.append(scores.mean())
+        rf_accuracies.append(all_metrics[-1][1])
+        #pipeline = make_pipeline(StandardScaler(), model)
+        #scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
+        #accuracies.append(scores.mean())
 
-    plt.plot(n_trees, accuracies, marker='o')
+    plt.plot(n_trees, rf_accuracies, marker='o')
     plt.xlabel('Número de Árvores')
     plt.ylabel('Acurácia Média')
     plt.title('Impacto do Número de Árvores na Acurácia do Random Forest')
@@ -280,7 +298,7 @@ def random_forest_experiment(X, Y, kf):
 
 def mlp_experiment(X, Y, kf):
     activations = ['identity', 'logistic', 'tanh', 'relu']
-    accuracies = []
+    mlp_accuracies = []
 
     for activation in activations:
         model = MLPClassifier(
@@ -292,15 +310,31 @@ def mlp_experiment(X, Y, kf):
             random_state=42
         )
         evaluate_model(model, X, Y, kf)  # Avalia o modelo com matriz de confusão e relatório de métricas
-        pipeline = make_pipeline(StandardScaler(), model)
-        scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
-        accuracies.append(scores.mean())
+        mlp_accuracies.append(all_metrics[-1][1])
+        #pipeline = make_pipeline(StandardScaler(), model)
+        #scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
+        #accuracies.append(scores.mean())
 
-    plt.bar(activations, accuracies, color='purple')
-    plt.xlabel('Função de Ativação')
-    plt.ylabel('Acurácia Média')
-    plt.title('Comparação entre Funções de Ativação do MLP')
-    plt.grid(True)
+    df_results = pd.DataFrame({
+        'Função de Ativação': activations,
+        'Acurácia Média': mlp_accuracies
+    })
+
+    # Plota a tabela usando matplotlib
+    fig, ax = plt.subplots(figsize=(8, 3))  # Ajuste o tamanho da figura conforme necessário
+    ax.axis('tight')
+    ax.axis('off')
+
+    # Adiciona o título da tabela
+    title = 'Comparação entre Funções de Ativação do MLP'
+    plt.title(title, fontsize=14, pad=20)
+
+    # Cria a tabela
+    table = ax.table(cellText=df_results.values, colLabels=df_results.columns, cellLoc='center', loc='center')
+    table.auto_set_font_size(False)
+    table.set_fontsize(12)
+    table.scale(1, 1.5)  # Ajusta o tamanho da célula
+
     plt.show()
 
 
@@ -308,16 +342,16 @@ def mlp_experiment(X, Y, kf):
 def results():
     kf = KFold(n_splits=5, shuffle=True,random_state=42)
 
-    naive_bayes_experiment(X, Y, kf)
+    #naive_bayes_experiment(X, Y, kf)
     svm_experiment(X, Y, kf)
-    #decision_tree_experiment(X, Y, kf)
-    #knn_experiment(X, Y, kf)
+    decision_tree_experiment(X, Y, kf)
+    knn_experiment(X, Y, kf)
     #random_forest_experiment(X, Y, kf)
     #mlp_experiment(X, Y, kf)
-    plotarAllMetrics()
-
-    for i in range(len(all_metrics)):
-        plot_confusion_matrix(i,all_metrics[i][0])
+    #plotarAllMetrics()
+    plot_all_confusion_matrix()
+    #for i in range(len(all_metrics)):
+    #    plot_confusion_matrix(i,all_metrics[i][0])
        #plot_confusion_matrix(all_confusion_matrix[i])
        
        
@@ -342,24 +376,29 @@ def plotarAllMetrics():
     table.auto_set_column_width(list(range(len(df.columns))))
     plt.show()
 
-def plot_confusion_matrix(i,model_name):
+def plot_all_confusion_matrix():
     # Seleciona a matriz de confusão pelo índice i
-    cm = all_confusion_matrix[i]
     
-    # Cria uma figura e um eixo
-    fig, ax = plt.subplots()
     
-    # Plota a matriz de confusão como um mapa de calor
-    sns.heatmap(cm, annot=True, fmt='.2f', cmap='Blues', ax=ax, cbar=False, 
-                xticklabels=['Confirmed', 'False Positive'], yticklabels=['Confirmed', 'False Positive'])
-    
-    # Configura os rótulos e o título
-    ax.set_xlabel('Predito')
-    ax.set_ylabel('Real')
-    ax.set_title('Matriz de Confusão -'+ str(model_name))  # Título opcionalmente pode incluir o índice do modelo
-    
-    # Exibe o gráfico
-    plt.show()
+
+    for i in range(len(all_metrics)):
+        model_name=all_metrics[i][0]
+        cm = all_confusion_matrix[i]
+        
+        # Cria uma figura e um eixo
+        fig, ax = plt.subplots()
+        
+        # Plota a matriz de confusão como um mapa de calor
+        sns.heatmap(cm, annot=True, fmt='.2f', cmap='Blues', ax=ax, cbar=False, 
+                    xticklabels=['Confirmed', 'False Positive'], yticklabels=['Confirmed', 'False Positive'])
+        
+        # Configura os rótulos e o título
+        ax.set_xlabel('Predito')
+        ax.set_ylabel('Real')
+        ax.set_title('Matriz de Confusão -'+ str(model_name))  # Título opcionalmente pode incluir o índice do modelo
+        
+        # Exibe o gráfico
+        plt.show()
 def main():
     initial_Count()  # Certifique-se de que essa função está definida
     #acuracia_media()
