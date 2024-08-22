@@ -127,12 +127,12 @@ def evaluate_model(model, X, Y, kf):
     # Calculando e exibindo a matriz de confusão
     cm = confusion_matrix(y_true, y_pred)
     print("Matriz de Confusão:")
-    plot_confusion_matrix(cm)
+    plot_confusion_matrix(cm, title="Matriz de Confusão de "+str(model))
 
     # Calculando e exibindo o relatório de métricas
-    cr = classification_report(y_true, y_pred, target_names=['False Positive', 'Confirmed'])
-    print("Relatório de Métricas:")
-    print(cr)
+    #cr = classification_report(y_true, y_pred, target_names=['False Positive', 'Confirmed'])
+    #print("Relatório de Métricas:")
+    #print(cr)
 
 def naive_bayes_experiment(X, Y, kf):
     model = GaussianNB()
