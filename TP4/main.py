@@ -102,7 +102,7 @@ def acuracia_media():
 def plot_confusion_matrix(cm, title='Matriz de Confusão'):
     fig, ax = plt.subplots()
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax, cbar=False, 
-                xticklabels=['False Positive', 'Confirmed'], yticklabels=['False Positive', 'Confirmed'])
+                xticklabels=['Confirmed', 'False Positive'], yticklabels=['Confirmed', 'False Positive'])
     ax.set_xlabel('Predito')
     ax.set_ylabel('Real')
     ax.set_title(title)
