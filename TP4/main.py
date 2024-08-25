@@ -99,7 +99,7 @@ def acuracia_media():
 
 
 
-def evaluate_model(model, X, Y, kf):
+def evaluate_model(model, X, Y, kf,model_name):
     y_true = []
     y_pred = []
     accuracies=[]
@@ -170,36 +170,13 @@ def evaluate_model(model, X, Y, kf):
     mean_recall = sum(recalls) / len(recalls)
     mean_f1 = sum(f1_scores) / len(f1_scores)
     all_confusion_matrix.append(cm)
-    all_metrics.append((str(model), round(mean_accuracy, 4), round(mean_precision, 4), round(mean_recall, 4), round(mean_f1, 4)))
-    #df = pd.DataFrame({'Fold': range(1, 5 + 1), 'Acurácia': accuracies})
+    all_metrics.append((str(model_name), round(mean_accuracy, 4), round(mean_precision, 4), round(mean_recall, 4), round(mean_f1, 4)))
 
-    # Adiciona uma linha com a acurácia média
-    #df.loc[len(df)] = ['Acurácia Média',round(mean_accuracy,4) ]
-
-    # Plota a tabela
-    # plt.figure(figsize=(5, 5))
-    # plt.table(cellText=df.values, colLabels=df.columns, cellLoc='center', loc='center')
-    # plt.axis('off')
-    # plt.title('Acurácia por Fold e Média para'+str(model))
-    # plt.show()
-
-         #Para plotar uma matriz de confusão para cada Avaliação KFold
-         #cm = confusion_matrix(y_true, y_pred)
-         #plot_confusion_matrix(cm, title="Matriz de Confusão de "+str(model))
-
-    # # Calculando e exibindo a matriz de confusão
-    # cm = confusion_matrix(y_true, y_pred)
-    # print("Matriz de Confusão:")
-    # plot_confusion_matrix(cm, title="Matriz de Confusão de "+str(model))
-
-    # Calculando e exibindo o relatório de métricas
-    #cr = classification_report(y_true, y_pred, target_names=['False Positive', 'Confirmed'])
-    #print("Relatório de Métricas:")
-    #print(cr)
 
 def naive_bayes_experiment(X, Y, kf):
     model = GaussianNB()
-    evaluate_model(model, X, Y, kf)  # Avalia o modelo com matriz de confusão e relatório de métricas
+    model_name="Naive Bayes"
+    evaluate_model(model, X, Y, kf,model_name)  # Avalia o modelo com matriz de confusão e relatório de métricas
     #pipeline = make_pipeline(StandardScaler(), model)
     #scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
     mean_accuracy = all_metrics[-1][1]
@@ -209,10 +186,10 @@ def naive_bayes_experiment(X, Y, kf):
 def decision_tree_experiment(X, Y, kf):
     depths = [None, 5, 10, 15, 20]
     dte_accuracies = []
-
+    model_name="Decision Tree with Depth "
     for depth in depths:
         model = DecisionTreeClassifier(max_depth=depth, random_state=42)
-        evaluate_model(model, X, Y, kf)  # Avalia o modelo com matriz de confusão e relatório de métricas
+        evaluate_model(model, X, Y, kf,model_name+str(depth))  # Avalia o modelo com matriz de confusão e relatório de métricas
         dte_accuracies.append(all_metrics[-1][1])
         #pipeline = make_pipeline(StandardScaler(), model)
         #scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
@@ -228,10 +205,10 @@ def decision_tree_experiment(X, Y, kf):
 def svm_experiment(X, Y, kf):
     kernels = ['linear', 'rbf']
     svm_accuracies = []
-
+    model_name="SVM with Kernel "
     for kernel in kernels:
         model = SVC(kernel=kernel, random_state=42)
-        evaluate_model(model, X, Y, kf)  # Avalia o modelo com matriz de confusão e relatório de métricas
+        evaluate_model(model, X, Y, kf,model_name+str(kernel))  # Avalia o modelo com matriz de confusão e relatório de métricas
         svm_accuracies.append(all_metrics[-1][1])
         #pipeline = make_pipeline(StandardScaler(), model)
         #scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
@@ -261,10 +238,10 @@ def svm_experiment(X, Y, kf):
 def knn_experiment(X, Y, kf):
     k_values = [1, 3, 5, 7, 9, 11]
     knn_accuracies = []
-
+    model_name="KNN with k_value "
     for k in k_values:
         model = KNeighborsClassifier(n_neighbors=k)
-        evaluate_model(model, X, Y, kf)  # Avalia o modelo com matriz de confusão e relatório de métricas
+        evaluate_model(model, X, Y, kf,model_name+str(k))  # Avalia o modelo com matriz de confusão e relatório de métricas
         knn_accuracies.append(all_metrics[-1][1])
         #pipeline = make_pipeline(StandardScaler(), model)
         #scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
@@ -280,10 +257,10 @@ def knn_experiment(X, Y, kf):
 def random_forest_experiment(X, Y, kf):
     n_trees = [10, 50, 100, 200, 300]
     rf_accuracies = []
-
+    model_name="Random Forest with N-Trees = "
     for n in n_trees:
         model = RandomForestClassifier(n_estimators=n, random_state=42)
-        evaluate_model(model, X, Y, kf)  # Avalia o modelo com matriz de confusão e relatório de métricas
+        evaluate_model(model, X, Y, kf,model_name+str(n))  # Avalia o modelo com matriz de confusão e relatório de métricas
         rf_accuracies.append(all_metrics[-1][1])
         #pipeline = make_pipeline(StandardScaler(), model)
         #scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
@@ -299,7 +276,7 @@ def random_forest_experiment(X, Y, kf):
 def mlp_experiment(X, Y, kf):
     activations = ['identity', 'logistic', 'tanh', 'relu']
     mlp_accuracies = []
-
+    model_name="MLP with activation "
     for activation in activations:
         model = MLPClassifier(
             hidden_layer_sizes=(25,),
@@ -309,7 +286,7 @@ def mlp_experiment(X, Y, kf):
             max_iter=1000,
             random_state=42
         )
-        evaluate_model(model, X, Y, kf)  # Avalia o modelo com matriz de confusão e relatório de métricas
+        evaluate_model(model, X, Y, kf, model_name+str(activation))  # Avalia o modelo com matriz de confusão e relatório de métricas
         mlp_accuracies.append(all_metrics[-1][1])
         #pipeline = make_pipeline(StandardScaler(), model)
         #scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
@@ -346,10 +323,12 @@ def results():
     svm_experiment(X, Y, kf)
     decision_tree_experiment(X, Y, kf)
     knn_experiment(X, Y, kf)
-    #random_forest_experiment(X, Y, kf)
-    #mlp_experiment(X, Y, kf)
-    #plotarAllMetrics()
+    random_forest_experiment(X, Y, kf)
+    mlp_experiment(X, Y, kf)
+    plotarAllMetrics()
     plot_all_confusion_matrix()
+    
+    
     #for i in range(len(all_metrics)):
     #    plot_confusion_matrix(i,all_metrics[i][0])
        #plot_confusion_matrix(all_confusion_matrix[i])
@@ -359,7 +338,7 @@ def results():
 
 def plotarAllMetrics():
     df = pd.DataFrame(all_metrics, columns=['Modelo', 'Acurácia Média', 'Precisão Média', 'Revocação Média', 'F1-Score Médio'])
-    
+    #df = pd.DataFrame([row[1:4] for row in all_metrics], columns=['Acurácia Média', 'Precisão Média', 'Revocação Média'])
     # Calcula o tamanho da figura com base no número de colunas e linhas
     n_rows, n_cols = df.shape
     fig_width = n_cols * 2  # Largura baseada no número de colunas
