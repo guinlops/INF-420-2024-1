@@ -138,8 +138,8 @@ def evaluate_model(model, X, Y, kf,model_name):
          pipeline.fit(X_train, Y_train)
          
          Y_pred = pipeline.predict(X_test)
-         y_true.extend(Y_test)# LENTO!
-         y_pred.extend(Y_pred)#LENTO!
+         #y_true.extend(Y_test)# LENTO!
+         #y_pred.extend(Y_pred)#LENTO!
         
          accuracy = accuracy_score(Y_test, Y_pred)
          aux_cm=confusion_matrix(Y_test,Y_pred)
