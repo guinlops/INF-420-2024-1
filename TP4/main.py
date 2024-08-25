@@ -32,16 +32,6 @@ all_metrics=[]
 all_confusion_matrix=[]
 num_classes = len(np.unique(Y))  # Calcula o número de classes com base nos dados
 
-# Usando KFold para Validação Cruzada com k igual a 5.
-models = {
-    'Naive Bayes': GaussianNB(),
-    'Decision Tree': DecisionTreeClassifier(),
-    'k-Nearest Neighbors': KNeighborsClassifier(),
-    'Support Vector Machines': SVC(),
-    'Random Forest': RandomForestClassifier(),
-    'Gradient Tree Boosting': GradientBoostingClassifier(),
-    # 'Multi-layer Perceptron': definida dentro do escopo da funcao
-}
 
 def initial_Count():
     contagens = df.koi_disposition.value_counts()
@@ -60,42 +50,42 @@ def initial_Count():
     # Exibindo a tabela
     plt.show()
 
-def acuracia_media():
-    results = {}
-    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+# def acuracia_media():
+#     results = {}
+#     kf = KFold(n_splits=5, shuffle=True, random_state=42)
 
-    for model_name, model in models.items():
-        # Cria o pipeline com a normalização e o modelo
-        pipeline = make_pipeline(StandardScaler(), model)
+#     for model_name, model in models.items():
+#         # Cria o pipeline com a normalização e o modelo
+#         pipeline = make_pipeline(StandardScaler(), model)
         
-        # Executa a validação cruzada k-fold
-        scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
+#         # Executa a validação cruzada k-fold
+#         scores = cross_val_score(pipeline, X, Y, cv=kf, scoring='accuracy')
         
-        # Armazena a acurácia média
-        print(f'{model_name}: Acurácia média = {scores.mean():.4f}, Desvio padrão = {scores.std():.4f}')
-        results[model_name] = scores.mean()
+#         # Armazena a acurácia média
+#         print(f'{model_name}: Acurácia média = {scores.mean():.4f}, Desvio padrão = {scores.std():.4f}')
+#         results[model_name] = scores.mean()
 
-    # Criando o gráfico de barras para comparar as acurácias médias
-    fig, ax = plt.subplots()
-    model_names = list(results.keys())
-    mean_accuracies = list(results.values())
+#     # Criando o gráfico de barras para comparar as acurácias médias
+#     fig, ax = plt.subplots()
+#     model_names = list(results.keys())
+#     mean_accuracies = list(results.values())
 
-    bars = ax.barh(model_names, mean_accuracies, color='red')
+#     bars = ax.barh(model_names, mean_accuracies, color='red')
 
-    # Adicionando marcações mais precisas no eixo x
-    ax.set_xlabel('Acurácia Média')
-    ax.set_title('Comparação das Acurácias Médias dos Modelos')
+#     # Adicionando marcações mais precisas no eixo x
+#     ax.set_xlabel('Acurácia Média')
+#     ax.set_title('Comparação das Acurácias Médias dos Modelos')
 
-    # Ajustando as marcações do eixo x
-    ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.4f}'))
+#     # Ajustando as marcações do eixo x
+#     ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.4f}'))
 
-    # Adicionando anotações para os valores máximos
-    for bar in bars:
-        width = bar.get_width()
-        ax.text(width + 0.01, bar.get_y() + bar.get_height()/2,
-                f'{width:.4f}', va='center', ha='left')
+#     # Adicionando anotações para os valores máximos
+#     for bar in bars:
+#         width = bar.get_width()
+#         ax.text(width + 0.01, bar.get_y() + bar.get_height()/2,
+#                 f'{width:.4f}', va='center', ha='left')
 
-    plt.show()
+#     plt.show()
 
 
 
