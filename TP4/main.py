@@ -140,31 +140,21 @@ def evaluate_model(model, X, Y, kf,model_name):
          Y_pred = pipeline.predict(X_test)
          y_true.extend(Y_test)# LENTO!
          y_pred.extend(Y_pred)#LENTO!
-
-
+        
          accuracy = accuracy_score(Y_test, Y_pred)
          aux_cm=confusion_matrix(Y_test,Y_pred)
          cm+=aux_cm
-        
-         #formatted_accuracy = float(f"{accuracy:.5f}")
-         
-            
-         accuracy = accuracy_score(Y_test, Y_pred)
+  
          precision = precision_score(Y_test, Y_pred, average='weighted')
          recall = recall_score(Y_test, Y_pred, average='weighted')
          f1 = f1_score(Y_test, Y_pred, average='weighted')
         
-         accuracies.append(round(accuracy, 4))
-         precisions.append(round(precision, 4))
-         recalls.append(round(recall, 4))
-         f1_scores.append(round(f1, 4))
-    
-         
-    
+         accuracies.append(accuracy)
+         precisions.append(precision)
+         recalls.append(recall)
+         f1_scores.append(f1)
     
 
-    
-    mean_accuracy = sum(accuracies) / len(accuracies)
     mean_accuracy = sum(accuracies) / len(accuracies)
     mean_precision = sum(precisions) / len(precisions)
     mean_recall = sum(recalls) / len(recalls)
@@ -273,6 +263,25 @@ def random_forest_experiment(X, Y, kf):
     plt.grid(True)
     plt.show()
 
+
+def gradient_boosting_experiment(X, Y, kf):
+    n_estimators = [10, 50, 100, 200, 300]
+    gb_accuracies = []
+    model_name = "Gradient Boosting with N_Estimators = "
+    
+    for n in n_estimators:
+        model = GradientBoostingClassifier(n_estimators=n, random_state=42)
+        evaluate_model(model, X, Y, kf, model_name + str(n))  # Avalia o modelo com matriz de confusão e relatório de métricas
+        gb_accuracies.append(all_metrics[-1][1])
+    
+    # Plotando o gráfico
+    plt.plot(n_estimators, gb_accuracies, marker='o')
+    plt.xlabel('Número de Iterações (Estimators)')
+    plt.ylabel('Acurácia Média')
+    plt.title('Impacto do Número de Iterações no Gradient Boosting')
+    plt.grid(True)
+    plt.show()
+
 def mlp_experiment(X, Y, kf):
     activations = ['identity', 'logistic', 'tanh', 'relu']
     mlp_accuracies = []
@@ -316,17 +325,7 @@ def mlp_experiment(X, Y, kf):
 
 
 
-def results():
-    kf = KFold(n_splits=5, shuffle=True,random_state=42)
 
-    #naive_bayes_experiment(X, Y, kf)
-    svm_experiment(X, Y, kf)
-    decision_tree_experiment(X, Y, kf)
-    knn_experiment(X, Y, kf)
-    random_forest_experiment(X, Y, kf)
-    mlp_experiment(X, Y, kf)
-    plotarAllMetrics()
-    plot_all_confusion_matrix()
     
     
     #for i in range(len(all_metrics)):
@@ -334,11 +333,40 @@ def results():
        #plot_confusion_matrix(all_confusion_matrix[i])
        
        
+import matplotlib.pyplot as plt
+import pandas as pd
 
-
-def plotarAllMetrics():
+def plotMetrics(metric_name):
+    # Cria o DataFrame apenas com as colunas de Modelo e Acurácia Média
     df = pd.DataFrame(all_metrics, columns=['Modelo', 'Acurácia Média', 'Precisão Média', 'Revocação Média', 'F1-Score Médio'])
-    #df = pd.DataFrame([row[1:4] for row in all_metrics], columns=['Acurácia Média', 'Precisão Média', 'Revocação Média'])
+    
+    # Pegar os nomes dos modelos e as acurácias
+    modelos = df['Modelo']
+    metrics = df[metric_name]
+    
+    # Plotar o gráfico de dispersão (scatter plot) vertical
+    plt.figure(figsize=(10, 6))
+    plt.scatter(metrics, modelos, color='blue', marker='o')
+    
+    # Adicionar título e rótulos aos eixos
+    plt.title(str(metric_name)+' por Modelo', fontsize=16)
+    plt.xlabel(str(metric_name), fontsize=12)
+    plt.ylabel('Modelo', fontsize=12)
+    
+    # Adicionar legendas aos pontos
+    for i, (modelo, metric) in enumerate(zip(modelos, metrics)):
+        plt.text(metric, modelo, f'{metric:.4f}', fontsize=10, ha='left', va='center')
+    
+    # Mostrar a grade para facilitar a visualização dos pontos
+    plt.grid(True)
+    
+    # Mostrar o gráfico
+    plt.tight_layout()
+    plt.show()
+
+def plotAllMetricsTable():
+    df = pd.DataFrame(all_metrics, columns=['Modelo', 'Acurácia Média', 'Precisão Média', 'Revocação Média', 'F1-Score Médio'])
+    
     # Calcula o tamanho da figura com base no número de colunas e linhas
     n_rows, n_cols = df.shape
     fig_width = n_cols * 2  # Largura baseada no número de colunas
@@ -355,11 +383,8 @@ def plotarAllMetrics():
     table.auto_set_column_width(list(range(len(df.columns))))
     plt.show()
 
-def plot_all_confusion_matrix():
+def plotAllConfusionmatrix():
     # Seleciona a matriz de confusão pelo índice i
-    
-    
-
     for i in range(len(all_metrics)):
         model_name=all_metrics[i][0]
         cm = all_confusion_matrix[i]
@@ -378,6 +403,30 @@ def plot_all_confusion_matrix():
         
         # Exibe o gráfico
         plt.show()
+
+
+def plotAllMetrics():
+    metrics=['Acurácia Média', 'Precisão Média', 'Revocação Média', 'F1-Score Médio']
+    for metric in metrics:
+        plotMetrics(metric)
+
+
+def results():
+    kf = KFold(n_splits=5, shuffle=True,random_state=42)
+
+    naive_bayes_experiment(X, Y, kf)
+    svm_experiment(X, Y, kf)
+    decision_tree_experiment(X, Y, kf)
+    knn_experiment(X, Y, kf)
+    random_forest_experiment(X, Y, kf)
+    gradient_boosting_experiment(X, Y, kf)
+    mlp_experiment(X, Y, kf)
+    plotAllConfusionmatrix()
+    plotAllMetrics()
+    plotAllMetricsTable()
+    
+
+
 def main():
     initial_Count()  # Certifique-se de que essa função está definida
     #acuracia_media()
